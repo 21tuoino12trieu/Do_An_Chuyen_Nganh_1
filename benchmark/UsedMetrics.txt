@@ -1,0 +1,6 @@
+Precision@K
+Recall@K
+HitRate@K
+MRR@K
+MAP
+NDCG@K
