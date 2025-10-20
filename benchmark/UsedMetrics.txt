@@ -78,7 +78,7 @@ NDCG@K
 4. Khi kết hợp với Precision@K sẽ tạo ra độ đo F1@K vừa đo độ sạch vừa đo độ phủ
 => Công thức F1@k = (2 * Precision@k * Recall@k)/(Precision@k + Recall@k)
 
-- Độ đo HitRate@K
+- Độ đo HitRate@K/ 
 1. Mục đích của HitRate@K
     Trong top-K kết quả, có ít nhất một tài liệu đúng (liên quan) hay không?
     Nó chỉ quan tâm có trúng hay không, chứ không cần biết bao nhiêu kết quả đúng.
@@ -86,3 +86,16 @@ NDCG@K
         HitRate@k(q) = 1 if nếu tồn tại trong top-K
                         0 if không tồn tại trong top-K
 2. Ví dụ 
+    Truy vấn: "Điều kiện để nhà thầu được tham gia đấu thầu là gì?"
+    Tài liệu đúng: R_q = {D1, D4, D6}
+    Hệ thống trả về top-5: L_q = [D2, D3, D8, D1, D9]
+    Trong top-5 có D1 ∈ R_q ⇒ hệ thống đã trúng ít nhất 1 tài liệu đúng.
+
+| K | Các tài liệu top-K   | Có tài liệu đúng không? | HitRate@K |
+| - | -------------------- | ----------------------- | --------- |
+| 1 | [D2]                 | ❌ Không                 | 0         |
+| 3 | [D2, D3, D8]         | ❌ Không                 | 0         |
+| 5 | [D2, D3, D8, D1, D9] | ✅ Có (D1)               | 1         |
+
+    HitRate@5 = 1, vì top-5 có ít nhất 1 đoạn đúng.
+    HitRate@3 = 0, vì top-3 toàn sai.
