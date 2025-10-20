@@ -1,3 +1,8 @@
+# File code này mục đích để định dạng lại dữ liệu 
+# Dữ liệu ban đầu nằm trong file data/triplets.jsonl và data/documents.jsonl
+# Trong đó data/triplets.jsonl chứa các trường query, positive_id, negative_id file này mục đích phục vụ cho việc finetune model embedding
+# và data/documents.jsonl chứa các trường id và document -> đây là nội dung của tài liệu và văn bản gốc
+# Mục đích của file này là kết hợp 2 file này để tạo ra file mới có 3 trường chính là query, positive_id và content tương ứng với nội dung của tài liệu.
 import json
 from pathlib import Path
 
