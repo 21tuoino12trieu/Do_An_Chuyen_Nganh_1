@@ -1,11 +1,12 @@
 import json
 import os
 import sys
+import time
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set
 
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 
 # Bảo đảm có thể import prompt.*
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -39,7 +40,11 @@ def main() -> None:
     triplets = load_triplets(input_path)
     total = len(triplets)
 
-    grouped_answers: Dict[str, set] = {}
+    grouped_answers: Dict[str, Set[str]] = {}
+
+    max_attempts = max(1, int(os.getenv("OPENAI_MAX_RETRIES", "5")))
+    base_delay = max(0.0, float(os.getenv("OPENAI_RETRY_DELAY", "1.0")))
+    retryable_statuses = {408, 409, 429, 500, 502, 503, 504}
 
     for idx, triplet in enumerate(triplets, start=1):
         user_question = triplet.get("query", "")
@@ -52,14 +57,34 @@ def main() -> None:
             f"response_law: {response_law}"
         )
 
-        response = client.chat.completions.create(
-            model="misa-qwen3-235b",
-            messages=[
-                {"role": "system", "content": PROMPT["FINDING_RELEVANT_ANSWERS"]},
-                {"role": "user", "content": combined_input},
-            ],
-            response_format={"type": "json_object"},
-        )
+        for attempt in range(1, max_attempts + 1):
+            try:
+                response = client.chat.completions.create(
+                    model="misa-qwen3-235b",
+                    messages=[
+                        {"role": "system", "content": PROMPT["FINDING_RELEVANT_ANSWERS"]},
+                        {"role": "user", "content": combined_input},
+                    ],
+                    response_format={"type": "json_object"},
+                )
+                break
+            except OpenAIError as exc:
+                status_code = getattr(exc, "status_code", None)
+                non_retryable = status_code is not None and status_code not in retryable_statuses
+                if attempt == max_attempts or non_retryable:
+                    raise
+
+                delay = base_delay * (2 ** (attempt - 1))
+                print(
+                    f"Retrying {idx}/{total} after {delay:.1f}s due to {exc.__class__.__name__} "
+                    f"(status={status_code})",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                time.sleep(delay)
+            except Exception:
+                # Preserve original traceback for unexpected failures
+                raise
 
         raw_content = response.choices[0].message.content.strip()
         try:
