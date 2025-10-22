@@ -18,7 +18,7 @@ OUTPUT_PATH = DATA_DIR / "question_n_rel_id_enriched.jsonl"
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from prompt.prompt_for_rematting_qa import PROMPT  # noqa: E402
+from Do_An_Chuyen_Nganh_1.prompt.prompts import PROMPT  # noqa: E402
 
 
 def load_jsonl(path: Path) -> List[Dict[str, Any]]:

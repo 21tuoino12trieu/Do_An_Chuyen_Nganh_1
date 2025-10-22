@@ -13,7 +13,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from prompt.prompt_for_rematting_qa import PROMPT  # noqa: E402
+from Do_An_Chuyen_Nganh_1.prompt.prompts import PROMPT  # noqa: E402
 
 
 def load_triplets(path: Path) -> List[Dict[str, Any]]:
