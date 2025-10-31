@@ -9,18 +9,19 @@ load_dotenv()
 from qdrant_client import QdrantClient
 from qdrant_client.http import models as qdrant_models
 
-device = "cuda:0"
 
-MODEL_NAME = "/data/small-language-models/cuong/Do_An/model/google_embeddinggemma-300m"
-ENCODE_BATCH_SIZE = 32
+device = "cuda:0"
+MODEL_NAME = (
+    "/data/small-language-models/cuong/Do_An/model/vietnamese_document_embedding"
+)
+ENCODE_BATCH_SIZE = 16
 UPLOAD_BATCH_SIZE = 32
 QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
-
 items = []
 with open(
-    "/data/small-language-models/cuong/Do_An_Chuyen_Nganh_1/data/semantic_chunking.jsonl",
+    "data/Retrieval/semantic_chunking_for_embedding.jsonl",
     "r",
     encoding="utf-8",
 ) as f:
@@ -40,14 +41,11 @@ with open(
             }
         )
 
-model = SentenceTransformer(MODEL_NAME)
-model.max_seq_length = 2048
-texts = [
-    f'title: {item.get("title", "none")} | text: {item["content"]}' for item in items
-]
+model = SentenceTransformer(MODEL_NAME, trust_remote_code=True, device=device)
+model.max_seq_length = 8096
 
 embeddings = model.encode(
-    texts,
+    [item["content"] for item in items],
     batch_size=ENCODE_BATCH_SIZE,
     convert_to_numpy=True,
     device=device,
@@ -62,9 +60,8 @@ client = QdrantClient(
 )
 
 dim = model.get_sentence_embedding_dimension()
-
 client.create_collection(
-    collection_name="legal_clauses_Gemma",
+    collection_name="legal_clauses_vn_dcm_embedding",
     vectors_config=qdrant_models.VectorParams(
         size=dim,
         distance=qdrant_models.Distance.COSINE,
@@ -91,9 +88,9 @@ for idx, (point_id, vector, item) in enumerate(zip(ids, embeddings, items)):
         )
     )
     if len(batch) >= UPLOAD_BATCH_SIZE:
-        client.upsert(collection_name="legal_clauses_Gemma", points=batch)
+        client.upsert(collection_name="legal_clauses_vn_dcm_embedding", points=batch)
         batch.clear()
 
-client.upsert(collection_name="legal_clauses_Gemma", points=batch)
+client.upsert(collection_name="legal_clauses_vn_dcm_embedding", points=batch)
 
 print("Upload successfully !")

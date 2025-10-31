@@ -9,10 +9,8 @@ load_dotenv()
 from qdrant_client import QdrantClient
 from qdrant_client.http import models as qdrant_models
 
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
-MODEL_NAME = (
-    "/data/small-language-models/cuong/Do_An/model/AITeamVN/Vietnamese_Embedding"
-)
+device = "cuda:0"
+MODEL_NAME = "/data/small-language-models/cuong/Do_An/model/jina-embeddings-v3"
 ENCODE_BATCH_SIZE = 16
 UPLOAD_BATCH_SIZE = 32
 QDRANT_URL = os.getenv("QDRANT_URL")
@@ -20,7 +18,7 @@ QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
 items = []
 with open(
-    "/data/small-language-models/cuong/Do_An_Chuyen_Nganh_1/data/semantic_chunking.jsonl",
+    "data/Retrieval/semantic_chunking_for_embedding.jsonl",
     "r",
     encoding="utf-8",
 ) as f:
@@ -40,8 +38,8 @@ with open(
             }
         )
 
-model = SentenceTransformer(MODEL_NAME)
-model.max_seq_length = 2048
+model = SentenceTransformer(MODEL_NAME, trust_remote_code=True)
+model.max_seq_length = 8192
 
 embeddings = model.encode(
     [item["content"] for item in items],
@@ -50,6 +48,7 @@ embeddings = model.encode(
     device=device,
     normalize_embeddings=True,
     show_progress_bar=True,
+    task="retrieval.passage",
 ).astype("float32")
 
 print("Embedding successfully !")
@@ -59,10 +58,9 @@ client = QdrantClient(
     api_key=QDRANT_API_KEY,
 )
 
-client.delete_collection("legal_clauses_AITeamVN")
 dim = model.get_sentence_embedding_dimension()
 client.create_collection(
-    collection_name="legal_clauses_AITeamVN",
+    collection_name="legal_clauses_jina-v3",
     vectors_config=qdrant_models.VectorParams(
         size=dim,
         distance=qdrant_models.Distance.DOT,
@@ -89,9 +87,9 @@ for idx, (point_id, vector, item) in enumerate(zip(ids, embeddings, items)):
         )
     )
     if len(batch) >= UPLOAD_BATCH_SIZE:
-        client.upsert(collection_name="legal_clauses_AITeamVN", points=batch)
+        client.upsert(collection_name="legal_clauses_jina-v3", points=batch)
         batch.clear()
 
-client.upsert(collection_name="legal_clauses_AITeamVN", points=batch)
+client.upsert(collection_name="legal_clauses_jina-v3", points=batch)
 
 print("Upload successfully !")
