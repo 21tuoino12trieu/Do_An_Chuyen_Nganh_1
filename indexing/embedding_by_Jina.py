@@ -10,7 +10,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http import models as qdrant_models
 
 device = "cuda:0"
-MODEL_NAME = "/data/small-language-models/cuong/Do_An/model/jina-embeddings-v3"
+MODEL_NAME = "/data/small-language-models/cuong/models/jina-embeddings-v3"
 ENCODE_BATCH_SIZE = 16
 UPLOAD_BATCH_SIZE = 32
 QDRANT_URL = os.getenv("QDRANT_URL")

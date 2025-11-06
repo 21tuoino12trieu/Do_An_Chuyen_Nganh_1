@@ -21,17 +21,15 @@ OUTPUT_DIR = Path("data/Result_by_Dense")
 TOP_K_VALUES: List[int] = [1, 3, 5, 10]
 COLLECTION_NAMES = [
     "legal_clauses_AITeamVN",
-    "legal_clauses_Gemma",
-    "legal_clauses_jina-v3",
-    "legal_clauses_Qwen3",
-    "legal_clauses_vn_dcm_embedding",
+    # "legal_clauses_jina-v3",
+    # "legal_clauses_Qwen3",
+    # "legal_clauses_vn_dcm_embedding",
 ]
 MODEL_NAMES = [
     "AITeamVN",
-    "google_embeddinggemma-300m",
-    "jina-embeddings-v3",
-    "Qwen3",
-    "vn_dcm_embedding",
+    # "jina-embeddings-v3",
+    # "Qwen3",
+    # "vn_dcm_embedding",
 ]
 
 
