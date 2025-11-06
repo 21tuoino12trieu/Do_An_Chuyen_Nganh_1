@@ -44,7 +44,7 @@ def read_questions(path: Path) -> Iterator[str]:
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
-    retriever = BM25Retriever(documents_path=str(DOCUMENTS_PATH))
+    retriever = BM25Retriever(data_path=str(DOCUMENTS_PATH))
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     for top_k in TOP_K_VALUES:
