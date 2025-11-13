@@ -23,12 +23,12 @@ load_dotenv()
 
 INPUT_QUESTION_PATH = Path("data/Retrieval/question_n_rel_id_enriched.jsonl")
 OUTPUT_DIR = Path("data/Result_by_Dense_Rerank")
-TOP_K_VALUES: List[int] = [1, 3, 5, 10]
+TOP_K_VALUES: List[int] = [10]
 COLLECTION_NAMES = [
     "legal_clauses_AITeamVN",
 ]
 OUTPUT_SUBDIRS = [
-    f"{Path(EMBEDDING_MODEL_PATH).name}__{Path(RERANKER_MODEL_PATH).name}",
+    f"{Path(EMBEDDING_MODEL_PATH).name}_{Path(RERANKER_MODEL_PATH).name}",
 ]
 
 
@@ -81,10 +81,10 @@ def main() -> None:
                         if res.get("article_id") and res.get("clause_id")
                     ]
                     payload = {"question": question, "answer": answer_ids}
+                    print(payload)
                     outfile.write(json.dumps(payload, ensure_ascii=False) + "\n")
                     count += 1
-
-            logger.info("Đã ghi %d kết quả vào %s", count, output_path)
+                    logger.info("Đã ghi %d kết quả vào %s", count, output_path)
 
 
 if __name__ == "__main__":
