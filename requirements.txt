@@ -5,7 +5,7 @@ python-dotenv==1.2.1
 qdrant_client==1.15.1
 rank_bm25==0.2.2
 sentence_transformers==5.1.1
-torch==2.7.1+cu128
+torch==2.7.1
 underthesea==8.3.0
 uvicorn==0.38.0
 streamlit==1.38.0
