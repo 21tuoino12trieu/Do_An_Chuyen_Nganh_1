@@ -20,7 +20,7 @@ if DEVICE == "cpu":
 
 EMBEDDING_CONFIGS: Dict[str, Dict[str, object]] = {
     "legal_clauses_AITeamVN": {
-        "model_path": "/data/small-language-models/cuong/models/AITeamVN",
+        "model_path": "models/AITeamVN",
         "max_seq_length": 2048,
         "encode_kwargs": {
             "normalize_embeddings": True,
