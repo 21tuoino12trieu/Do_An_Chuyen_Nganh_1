@@ -19,8 +19,13 @@ if DEVICE == "cpu":
     logger.warning("CUDA device not available, falling back to CPU for embeddings")
 
 EMBEDDING_CONFIGS: Dict[str, Dict[str, object]] = {
+    # Ưu tiên dùng model local; nếu không có thì fallback sang model trên Hugging Face
     "legal_clauses_AITeamVN": {
-        "model_path": "models/AITeamVN",
+        "model_path": "models/AITeamVN",  # local path (máy cá nhân, server riêng)
+        # tên model trên Hugging Face; có thể override qua biến môi trường AITEAMVN_REMOTE_MODEL
+        "remote_model_name": os.getenv(
+            "AITEAMVN_REMOTE_MODEL", "AITeamVN/Vietnamese_Embedding"
+        ),
         "max_seq_length": 2048,
         "encode_kwargs": {
             "normalize_embeddings": True,
@@ -92,10 +97,22 @@ class DenseVectorRetriever:
             logger.error("No embedding configuration found for key '%s'", config_name)
             raise ValueError(f"No embedding configuration found for key '{config_name}'")
 
-        model_path = self.embedding_config["model_path"]
-        if not isinstance(model_path, str) or not os.path.exists(model_path):
-            logger.error("Embedding model path is invalid: %s", model_path)
-            raise FileNotFoundError(f"Embedding model path is invalid: {model_path}")
+        # Ưu tiên dùng đường dẫn local (nếu tồn tại); nếu không thì dùng tên model remote (HF)
+        local_model_path = self.embedding_config.get("model_path")
+        remote_model_name = self.embedding_config.get("remote_model_name")
+        if isinstance(local_model_path, str) and os.path.exists(local_model_path):
+            model_source = local_model_path
+        elif isinstance(remote_model_name, str) and remote_model_name:
+            model_source = remote_model_name
+        else:
+            logger.error(
+                "Embedding model path is invalid (local='%s', remote='%s')",
+                local_model_path,
+                remote_model_name,
+            )
+            raise FileNotFoundError(
+                f"Embedding model path is invalid: local='{local_model_path}', remote='{remote_model_name}'"
+            )
 
         try:
             self.qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
@@ -107,9 +124,9 @@ class DenseVectorRetriever:
         model_kwargs.setdefault("device", DEVICE)
 
         try:
-            self.embedding_model = SentenceTransformer(model_path, **model_kwargs)
+            self.embedding_model = SentenceTransformer(model_source, **model_kwargs)
         except Exception as exc:
-            logger.error("Failed to load embedding model from %s", model_path, exc_info=exc)
+            logger.error("Failed to load embedding model from %s", model_source, exc_info=exc)
             raise
 
         max_seq_length = self.embedding_config.get("max_seq_length")
@@ -121,9 +138,10 @@ class DenseVectorRetriever:
         self.encode_kwargs.setdefault("device", DEVICE)
 
         logger.info(
-            "DenseVectorRetriever initialized for collection %s (embedding key: %s) on device %s",
+            "DenseVectorRetriever initialized for collection %s (embedding key: %s, model: %s) on device %s",
             self.collection_name,
             config_name,
+            model_source,
             DEVICE,
         )
 

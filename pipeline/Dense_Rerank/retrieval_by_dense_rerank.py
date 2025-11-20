@@ -15,9 +15,18 @@ load_dotenv()
 
 QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
-EMBEDDING_MODEL_PATH = "models/AITeamVN"
 
-RERANKER_MODEL_PATH = "models/bge-reranker-v2-m3"
+# Đường dẫn local (máy bạn / server riêng)
+EMBEDDING_LOCAL_PATH = "models/AITeamVN"
+RERANKER_LOCAL_PATH = "models/bge-reranker-v2-m3"
+
+# Tên model trên Hugging Face (Cloud sẽ dùng nếu không có local)
+EMBEDDING_REMOTE_MODEL = os.getenv(
+    "AITEAMVN_REMOTE_MODEL", "AITeamVN/Vietnamese_Embedding"
+)
+RERANKER_REMOTE_MODEL = os.getenv(
+    "BGE_RERANKER_REMOTE_MODEL", "BAAI/bge-reranker-v2-m3"
+)
 
 logger = logging.getLogger(__name__)
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -41,11 +50,32 @@ class DenseRerank:
             url=QDRANT_URL,
             api_key=QDRANT_API_KEY,
         )
+
+        # Ưu tiên model local, nếu không có thì dùng model Hugging Face
+        if os.path.exists(EMBEDDING_LOCAL_PATH):
+            embedding_source = EMBEDDING_LOCAL_PATH
+        else:
+            embedding_source = EMBEDDING_REMOTE_MODEL
+
+        if os.path.exists(RERANKER_LOCAL_PATH):
+            reranker_source = RERANKER_LOCAL_PATH
+        else:
+            reranker_source = RERANKER_REMOTE_MODEL
+
+        if not embedding_source:
+            raise FileNotFoundError(
+                f"Embedding model path is invalid: local='{EMBEDDING_LOCAL_PATH}', remote='{EMBEDDING_REMOTE_MODEL}'"
+            )
+        if not reranker_source:
+            raise FileNotFoundError(
+                f"Reranker model path is invalid: local='{RERANKER_LOCAL_PATH}', remote='{RERANKER_REMOTE_MODEL}'"
+            )
+
         self.embedding_model = SentenceTransformer(
-            EMBEDDING_MODEL_PATH,
+            embedding_source,
             device=DEVICE,
         )
-        self.reranker = FlagReranker(RERANKER_MODEL_PATH,use_fp16=True)
+        self.reranker = FlagReranker(reranker_source, use_fp16=True)
 
     def search(self, query: str, top_k: int = DEFAULT_SEARCH_LIMIT) -> List[Dict[str, Any]]:
         if top_k <= 0:
