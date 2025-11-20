@@ -75,7 +75,7 @@ class DenseRerank:
             embedding_source,
             device=DEVICE,
         )
-        self.reranker = FlagReranker(reranker_source, use_fp16=True)
+        self.reranker = FlagReranker(reranker_source)
 
     def search(self, query: str, top_k: int = DEFAULT_SEARCH_LIMIT) -> List[Dict[str, Any]]:
         if top_k <= 0:
