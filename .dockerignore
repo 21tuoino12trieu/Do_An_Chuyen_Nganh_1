@@ -1,0 +1,22 @@
+# Ignore git and configuration
+.git
+.vscode
+.devcontainer
+.gitignore
+
+# Ignore python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments (Crucial: do not copy Windows venv to Linux container)
+venv/
+env/
+
+# Ignore test cache
+.pytest_cache/
+
+# Ignore local data or large temporary files if needed
+# data/
+# models/ # Uncomment if models are too large and loaded from external source
