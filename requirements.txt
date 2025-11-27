@@ -1,5 +1,5 @@
 fastapi==0.120.2
-numpy==2.3.4
+numpy==2.2.6
 openai==2.6.1
 python-dotenv==1.2.1
 qdrant_client==1.15.1

@@ -11,7 +11,7 @@ from qdrant_client.http import models as qdrant_models
 
 
 device = "cuda:0"
-MODEL_NAME = "/data/small-language-models/cuong/models/Qwen3-Embedding-0.6B"
+MODEL_NAME = "models/Qwen3-Embedding-0.6B"
 ENCODE_BATCH_SIZE = 8
 UPLOAD_BATCH_SIZE = 32
 QDRANT_URL = os.getenv("QDRANT_URL")

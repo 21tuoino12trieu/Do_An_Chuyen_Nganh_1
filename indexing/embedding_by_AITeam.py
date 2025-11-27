@@ -11,7 +11,7 @@ from qdrant_client.http import models as qdrant_models
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 MODEL_NAME = (
-    "/data/small-language-models/cuong/models/AITeamVN"
+    "models/AITeamVN"
 )
 ENCODE_BATCH_SIZE = 16
 UPLOAD_BATCH_SIZE = 32

@@ -12,7 +12,7 @@ from qdrant_client.http import models as qdrant_models
 
 device = "cuda:0"
 MODEL_NAME = (
-    "/data/small-language-models/cuong/models/vietnamese-document-embedding"
+    "models/vietnamese-document-embedding"
 )
 ENCODE_BATCH_SIZE = 16
 UPLOAD_BATCH_SIZE = 32
