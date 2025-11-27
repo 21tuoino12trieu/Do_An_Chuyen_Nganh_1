@@ -39,17 +39,6 @@ Dự án sử dụng bộ metrics tiêu chuẩn trong Information Retrieval đ�
 *   **MAP (Mean Average Precision):** Độ chính xác trung bình, tính đến thứ hạng của tất cả các kết quả đúng.
 *   **NDCG (Normalized Discounted Cumulative Gain):** Đánh giá chất lượng xếp hạng có tính đến mức độ liên quan (0: không liên quan, 1: cùng văn bản, 2: đúng điều khoản).
 
-### Kết quả Thí nghiệm Tiêu biểu
-
-Dựa trên bộ dữ liệu Ground Truth đã xây dựng:
-
-| Phương pháp | Model | Precision@1 | MAP@10 | NDCG@10 | Ghi chú |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **BM25** | Baseline | 0.476 | 0.540 | 0.700 | Phương pháp tìm kiếm từ khóa truyền thống. |
-| **Dense** | **AITeamVN** | **0.654** | **0.695** | **0.820** | Hiệu quả vượt trội nhờ fine-tune trên domain luật. |
-| **Dense** | Qwen3 | ~0.511 | - | - | Precision tốt ở top 5 nhưng Recall thấp hơn AITeamVN. |
-| **Dense** | vn_dcm | ~0.466 | - | - | Baseline cho embedding tiếng Việt. |
-
 ## Cài đặt
 
 ### Yêu cầu hệ thống
