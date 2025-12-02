@@ -83,6 +83,7 @@ Xem biểu đồ so sánh hiệu quả giữa các phương pháp (F1, MAP, NDCG
 ```bash
 streamlit run experiments_dashboard_app.py
 ```
+Minh họa trực tuyến: [https://doanchuyennganh1.streamlit.app/](https://uidashboard.streamlit.app/)
 
 ### 3. Đánh chỉ mục dữ liệu (Indexing)
 Nếu chạy lần đầu hoặc dữ liệu thay đổi, bạn cần vector hóa và đẩy dữ liệu lên Qdrant:
